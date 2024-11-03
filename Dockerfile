@@ -50,6 +50,7 @@ COPY backend/ ./backend/
 COPY base/ ./base/
 COPY manage.py .
 COPY static/ ./static/
+COPY .env .env
 
 # Change ownership of the app directory
 RUN chown -R appuser:appuser /app
