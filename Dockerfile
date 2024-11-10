@@ -52,6 +52,10 @@ COPY manage.py .
 COPY static/ ./static/
 COPY .env .env
 
+# Copy and set up entrypoint script
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
+
 # Change ownership of the app directory
 RUN chown -R appuser:appuser /app
 
@@ -62,4 +66,7 @@ USER appuser
 EXPOSE 8000
 
 # Run the application
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
+
+ENTRYPOINT ["./entrypoint.sh"]
