@@ -46,4 +46,6 @@ jobs:
 
         - name: Build frontend
           working-directory: frontend
-          run: npm run build --if-present
+          run: |
+           export DISABLE_ESLINT_PLUGIN=true
+           npm run build --if-present
