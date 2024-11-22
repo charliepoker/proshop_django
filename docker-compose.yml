@@ -68,14 +68,8 @@ services:
     build: .
     ports:
       - "8000:8000"
-    environment:
-      - DEBUG=1
-      - SECRET_KEY=your_secret_key
-      - POSTGRES_DB=proshop
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - DB_HOST=db
-      - DB_PORT=5432
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
@@ -98,12 +92,10 @@ services:
     image: postgres:13
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=proshop
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
+    env_file:
+      - .env
     ports:
-      - "5430:5432"
+      - "5432:5432"
     networks:
       - proshop-network
     healthcheck:
