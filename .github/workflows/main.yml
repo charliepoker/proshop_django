@@ -161,6 +161,9 @@ jobs:
       uses: docker/metadata-action@v4
       with:
         images: ${{ secrets.DOCKER_USERNAME }}/proshop
+        tags: |
+          type=ref,event=branch
+          type=semver,pattern={{version}}
 
     # Build and push backend Docker image
     - name: Build and push backend Docker image
