@@ -155,15 +155,16 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}  # Docker Hub username (from secrets)
         password: ${{ secrets.DOCKER_PASSWORD }}  # Docker Hub password (from secrets)
 
-    # Extract metadata for Docker
+    # Extract metadata (tags, labels) for Docker
     - name: Extract metadata (tags, labels) for Docker
       id: meta
       uses: docker/metadata-action@v4
       with:
-        images: ${{ secrets.DOCKER_USERNAME }}/proshop
+        images: ${{ secrets.DOCKER_USERNAME }}/proshop-backend
         tags: |
-          type=ref,event=branch
-          type=semver,pattern={{version}}
+          type=ref,event=branch  # Generate tags based on branch names
+          type=ref,event=pr      # Generate tags based on pull request IDs
+          type=sha               # Use the short commit SHA as a fallback
 
     # Build and push backend Docker image
     - name: Build and push backend Docker image
