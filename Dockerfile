@@ -50,7 +50,7 @@ COPY backend/ ./backend/
 COPY base/ ./base/
 COPY manage.py .
 COPY static/ ./static/
-COPY .env .env
+# COPY .env .env
 
 # Copy and set up entrypoint script
 COPY entrypoint.sh .
