@@ -169,9 +169,13 @@ jobs:
     # Build and push backend Docker image
     - name: Build and push backend Docker image
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/proshop-backend:latest -t ${{ secrets.DOCKER_USERNAME }}/proshop-backend:${{ steps.meta.outputs.tags }} -f Dockerfile .
-        docker push ${{ secrets.DOCKER_USERNAME }}/proshop-backend:latest
-        docker push ${{ secrets.DOCKER_USERNAME }}/proshop-backend:${{ steps.meta.outputs.tags }}
+          TAG=$(echo "${{ steps.meta.outputs.tags }}" | tr -d '[:space:]' | tr '/' '-' | tr ':' '-')
+          echo "Using sanitized tag: $TAG"
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/proshop-backend:latest \
+                       -t ${{ secrets.DOCKER_USERNAME }}/proshop-backend:$TAG \
+                       -f Dockerfile .
+          docker push ${{ secrets.DOCKER_USERNAME }}/proshop-backend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/proshop-backend:${{ steps.meta.outputs.tags }}
 
 
     # Build and push frontend Docker image
