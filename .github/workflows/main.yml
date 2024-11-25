@@ -155,27 +155,6 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}  # Docker Hub username (from secrets)
         password: ${{ secrets.DOCKER_PASSWORD }}  # Docker Hub password (from secrets)
 
-    # # Extract metadata (tags, labels) for Docker
-    # - name: Extract metadata (tags, labels) for Docker
-    #   id: meta
-    #   uses: docker/metadata-action@v4
-    #   with:
-    #     images: ${{ secrets.DOCKER_USERNAME }}/proshop-backend
-    #     tags: |
-    #       type=ref,event=branch  # Generate tags based on branch names
-    #       type=ref,event=pr      # Generate tags based on pull request IDs
-    #       type=sha               # Use the short commit SHA as a fallback
-
-    # # Build and push backend Docker image
-    # - name: Build and push backend Docker image
-    #   run: |
-    #       TAG=$(echo "${{ steps.meta.outputs.tags }}" | tr -d '[:space:]' | tr '/' '-' | tr ':' '-')
-    #       echo "Using sanitized tag: $TAG"
-    #       docker build -t ${{ secrets.DOCKER_USERNAME }}/proshop-backend:latest \
-    #                    -t ${{ secrets.DOCKER_USERNAME }}/proshop-backend:$TAG \
-    #                    -f Dockerfile .
-    #       docker push ${{ secrets.DOCKER_USERNAME }}/proshop-backend:latest
-    #       docker push ${{ secrets.DOCKER_USERNAME }}/proshop-backend:${{ steps.meta.outputs.tags }}
 
     - name: Increment version
       id: version
@@ -185,12 +164,12 @@ jobs:
 
     - name: Build and push Docker image
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/proshop-backend:${{ env.version }} -f Dockerfile .
-        docker push ${{ secrets.DOCKER_USERNAME }}/proshop-backend:${{ env.version }}
+        docker build --progress=plain -t ${{ secrets.DOCKER_USERNAME }}/proshop-backend:${{ env.version }} -f Dockerfile . || exit 1
+        docker push --progress=plain ${{ secrets.DOCKER_USERNAME }}/proshop-backend:${{ env.version }} || exit 1
 
     # Build and push frontend Docker image
     - name: Build and push frontend Docker image
       working-directory: frontend  # Change working directory to frontend
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/proshop-frontend:${{ env.version }} -f Dockerfile .  # Build frontend image
-        docker push ${{ secrets.DOCKER_USERNAME }}/proshop-frontend:${{ env.version }}  # Push frontend image to Docker Hub
+        docker build --progress=plain -t ${{ secrets.DOCKER_USERNAME }}/proshop-frontend:${{ env.version }} -f Dockerfile .   || exit 1 # Build frontend image
+        docker push --progress=plain ${{ secrets.DOCKER_USERNAME }}/proshop-frontend:${{ env.version }}  || exit 1 # Push frontend image to Docker Hub
