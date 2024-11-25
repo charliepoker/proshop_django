@@ -155,28 +155,38 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}  # Docker Hub username (from secrets)
         password: ${{ secrets.DOCKER_PASSWORD }}  # Docker Hub password (from secrets)
 
-    # Extract metadata (tags, labels) for Docker
-    - name: Extract metadata (tags, labels) for Docker
-      id: meta
-      uses: docker/metadata-action@v4
-      with:
-        images: ${{ secrets.DOCKER_USERNAME }}/proshop-backend
-        tags: |
-          type=ref,event=branch  # Generate tags based on branch names
-          type=ref,event=pr      # Generate tags based on pull request IDs
-          type=sha               # Use the short commit SHA as a fallback
+    # # Extract metadata (tags, labels) for Docker
+    # - name: Extract metadata (tags, labels) for Docker
+    #   id: meta
+    #   uses: docker/metadata-action@v4
+    #   with:
+    #     images: ${{ secrets.DOCKER_USERNAME }}/proshop-backend
+    #     tags: |
+    #       type=ref,event=branch  # Generate tags based on branch names
+    #       type=ref,event=pr      # Generate tags based on pull request IDs
+    #       type=sha               # Use the short commit SHA as a fallback
 
-    # Build and push backend Docker image
-    - name: Build and push backend Docker image
+    # # Build and push backend Docker image
+    # - name: Build and push backend Docker image
+    #   run: |
+    #       TAG=$(echo "${{ steps.meta.outputs.tags }}" | tr -d '[:space:]' | tr '/' '-' | tr ':' '-')
+    #       echo "Using sanitized tag: $TAG"
+    #       docker build -t ${{ secrets.DOCKER_USERNAME }}/proshop-backend:latest \
+    #                    -t ${{ secrets.DOCKER_USERNAME }}/proshop-backend:$TAG \
+    #                    -f Dockerfile .
+    #       docker push ${{ secrets.DOCKER_USERNAME }}/proshop-backend:latest
+    #       docker push ${{ secrets.DOCKER_USERNAME }}/proshop-backend:${{ steps.meta.outputs.tags }}
+
+    - name: Increment version
+      id: version
       run: |
-          TAG=$(echo "${{ steps.meta.outputs.tags }}" | tr -d '[:space:]' | tr '/' '-' | tr ':' '-')
-          echo "Using sanitized tag: $TAG"
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/proshop-backend:latest \
-                       -t ${{ secrets.DOCKER_USERNAME }}/proshop-backend:$TAG \
-                       -f Dockerfile .
-          docker push ${{ secrets.DOCKER_USERNAME }}/proshop-backend:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/proshop-backend:${{ steps.meta.outputs.tags }}
+        VERSION=v$(git rev-list --count HEAD)
+        echo "version=$VERSION" >> $GITHUB_ENV
 
+    - name: Build and push Docker image
+      run: |
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/proshop-backend:${{ env.version }} -f Dockerfile .
+        docker push ${{ secrets.DOCKER_USERNAME }}/proshop-backend:${{ env.version }}
 
     # Build and push frontend Docker image
     - name: Build and push frontend Docker image
